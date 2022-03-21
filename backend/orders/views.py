@@ -23,9 +23,7 @@ class OrderList(viewsets.ModelViewSet):
         order_detail_ingresado = request.data["orderDetails"]
 
         for prodDB in data_order:
-    
             for orderDetail in order_detail_ingresado:
-
                 if not dict(dict(prodDB)['product'])['pk'] == orderDetail['product']['pk']:
                     data = {
                         "cuantity": orderDetail['cuantity'],

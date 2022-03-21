@@ -3,4 +3,5 @@ djangorestframework
 djangorestframework-simplejwt
 pyyaml
 requests
+gunicorn
 django-cors-headers

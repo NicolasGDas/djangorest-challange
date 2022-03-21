@@ -19,6 +19,7 @@ from django.urls import path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('',include('api.urls')),
     path('api/',include('api.urls')),
     #La agrego aca para comodidad, pero en caso de tener que usar mas cosas que esta api que implementamos podria
     #meter este path en la carpeta de api.urls y seria lo mismo y quedaria

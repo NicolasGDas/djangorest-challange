@@ -1,7 +1,7 @@
-from dataclasses import dataclass 
+from dataclasses import dataclass
 import requests
 from getpass import getpass
-import pathlib 
+import pathlib
 import json
 
 
@@ -16,12 +16,12 @@ class JWTClient:
     # ensure this matches your simplejwt config
     header_type: str = "Bearer"
     # this assumesy ou have DRF running on localhost:8000
-    base_endpoint = "http://localhost:8000/api"
+    base_endpoint = "http://nicog.pythonanywhere.com/api"
     # this file path is insecure
     cred_path: pathlib.Path = pathlib.Path("creds.json")
 
     def __post_init__(self):
-        if self.cred_path.exists(): 
+        if self.cred_path.exists():
             """
             You have stored creds,
             let's verify them
@@ -35,7 +35,7 @@ class JWTClient:
                 print("Assuming creds has been tampered with")
                 data = None
             if data is None:
-                """ 
+                """
                 Clear stored creds and
                 Run login process
                 """
@@ -44,7 +44,7 @@ class JWTClient:
             else:
                 """
                 `creds.json` was not tampered with
-                Verify token -> 
+                Verify token ->
                 if necessary, Refresh token ->
                 if necessary, Run login process
                 """
@@ -71,7 +71,7 @@ class JWTClient:
             Run login process
             """
             self.perform_auth()
-        
+
     def get_headers(self, header_type=None):
         """
         Default headers for HTTP requests
@@ -91,10 +91,10 @@ class JWTClient:
         Without exposing password(s) during the
         collection process.
         """
-        endpoint = f"{self.base_endpoint}/token/" 
+        endpoint = f"{self.base_endpoint}/token/"
         username = input("What is your username?\n")
         password = getpass("What is your password?\n")
-        r = requests.post(endpoint, json={'username': username, 'password': password}) 
+        r = requests.post(endpoint, json={'username': username, 'password': password})
         if r.status_code != 200:
             raise Exception(f"Access not granted: {r.text}")
         print('access granted')
@@ -111,7 +111,7 @@ class JWTClient:
             self.refresh = data.get('refresh')
             if self.access and self.refresh:
                 self.cred_path.write_text(json.dumps(data))
-    
+
     def verify_token(self):
         """
         Simple method for verifying your
@@ -122,10 +122,10 @@ class JWTClient:
         data = {
             "token": f"{self.access}"
         }
-        endpoint = f"{self.base_endpoint}/token/verify/" 
+        endpoint = f"{self.base_endpoint}/token/verify/"
         r = requests.post(endpoint, json=data)
         return r.status_code == 200
-    
+
     def clear_tokens(self):
         """
         Remove any/all JWT token data
@@ -136,7 +136,7 @@ class JWTClient:
         self.refresh = None
         if self.cred_path.exists():
             self.cred_path.unlink()
-    
+
     def perform_refresh(self):
         """
         Refresh the access token by using the correct
@@ -147,7 +147,7 @@ class JWTClient:
         data = {
             "refresh": f"{self.refresh}"
         }
-        endpoint = f"{self.base_endpoint}/token/refresh/" 
+        endpoint = f"{self.base_endpoint}/token/refresh/"
         r = requests.post(endpoint, json=data, headers=headers)
         if r.status_code != 200:
             self.clear_tokens()
@@ -171,8 +171,8 @@ class JWTClient:
         """
         headers = self.get_headers()
         if endpoint is None or self.base_endpoint not in str(endpoint):
-            endpoint = f"{self.base_endpoint}/products/?limit={limit}" 
-        r = requests.get(endpoint, headers=headers) 
+            endpoint = f"{self.base_endpoint}/products/?limit={limit}"
+        r = requests.get(endpoint, headers=headers)
         if r.status_code != 200:
             raise Exception(f"Request not complete {r.text}")
         data = r.json()
@@ -183,10 +183,10 @@ if __name__ == "__main__":
     """
     Here's Simple example of how to use our client above.
     """
-    
+
     # this will either prompt a login process
     # or just run with current stored data
-    client = JWTClient() 
+    client = JWTClient()
 
     # simple instance method to perform an HTTP
     # request to our /api/products/ endpoint

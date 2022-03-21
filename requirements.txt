@@ -6,3 +6,5 @@ requests
 gunicorn
 django-cors-headers
 django-heroku
+sqlparse
+pytz

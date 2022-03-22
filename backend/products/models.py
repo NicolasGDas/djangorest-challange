@@ -8,8 +8,11 @@ class Product(models.Model):
 
     def get_total_usd(self,valor_actual):
         return self.price * valor_actual
+        
     def decrement_stock(self,value):
         self.stock = self.stock - value
+        print('decrement: {self.stock}')
+
     def get_stock(self):
         return self.stock
     def update_stock(self,new_stock):

@@ -40,11 +40,11 @@ class OrderDetailModifySerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         id = attrs['product'].id
         product = (Product.objects.filter(id__exact = id)).values()
+        print(attrs['cuantity'])
         if attrs['cuantity'] <= 0:
             raise serializers.ValidationError("La cantidad no puede ser 0")
         if product[0]['stock'] < attrs['cuantity']:
             raise serializers.ValidationError("No hay suficiente stock")
-        order = (Order.objects.filter(id__exact = attrs['order'].id)).values()
 
 
         return super().validate(attrs)
@@ -55,7 +55,7 @@ class OrderDetailModifySerializer(serializers.ModelSerializer):
         # print(validated_data)
         product = validated_data.pop('product')
         cuantity =validated_data.pop('cuantity')
-        product.update_stock(cuantity)
+        product.decrement_stock(cuantity)
         product.save()
         validated_data["product"] = (product)
         validated_data["cuantity"] = (cuantity)

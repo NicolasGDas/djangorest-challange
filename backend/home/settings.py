@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-bork!e97rxa4w#!9kauw68a0=nx39v*=%j!m#)^!2n^f#(x7jx'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['nicog.pythonanywhere.com']
+ALLOWED_HOSTS = ['nicog.pythonanywhere.com','localhost']
 
 
 # Application definition
@@ -123,8 +123,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = '/static'
-STATIC_ROOT = '/home/nicog/djangorest-challange/backend/static'
+STATIC_URL = 'static/'
+# STATIC_ROOT = '/home/nicog/djangorest-challange/backend/static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

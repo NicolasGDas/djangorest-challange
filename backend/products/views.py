@@ -7,6 +7,7 @@ from .serializers import ProductSerializer,ProductPublicSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from api.authentication import get_JTKAuth
+from rest_framework import status
 
 class ProductList(viewsets.ModelViewSet):
     queryset = Product.objects.all()
@@ -35,7 +36,7 @@ class ProductList(viewsets.ModelViewSet):
             endpoint = f"http://localhost:8000/api/products/{pk}/"
             retorno = requests.patch(endpoint,json=data,headers=get_JTKAuth())
         else:
-            raise Exception("Por favor ingrese un stock para actualizar")
+            return Response("No ingreso stock para modificar",status= status.HTTP_400_BAD_REQUEST)
 
 
         return Response(retorno.json())

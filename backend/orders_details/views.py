@@ -33,4 +33,19 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         return super().destroy(request, *args, **kwargs)
 
+    def update(self, request, *args, **kwargs):
+        obj = self.get_object()
+        product = obj.product
+
+        if request.data.get('cuantity'):
+            product.increment_stock(obj.cuantity)
+            product.save()
+            print(product.get_stock())
+            if int(product.get_stock()) > int(request.data.get('cuantity')):
+                product.decrement_stock(int(request.data.get('cuantity')))
+                product.save()
+
+        return super().update(request, *args, **kwargs)
+
+    
     

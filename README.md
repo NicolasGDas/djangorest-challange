@@ -1,7 +1,8 @@
 # djangorest-challange
 
 La app esta deployada en http://nicog.pythonanywhere.com/ Para poder actuar con esa api se necesitan credenciales. Se las mando por mail para que puedan usarlas.
-
+En caso de clonar la app y se quiere usar el web version tambien deberan usar las mismas credenciales.
+En caso de querer probar los endpoints con postman se puede correr en el archivo jwt.py, buscar en el archivo que crea de creds.json el valor de 'access' y con eso se pasa como berer token de postman y ya van a estar autorizados.
 los endpoints desarrollados son
 
 /api/productos/                  method['GET'] -> Trae todos los productos.

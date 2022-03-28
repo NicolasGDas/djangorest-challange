@@ -1,11 +1,10 @@
-import json
-import re
-from rest_framework import  viewsets,serializers
+from rest_framework.response import Response
+from rest_framework import  viewsets
 from .models import OrderDetail
 from .serializers import OrderDetailListSerializer,OrderDetailModifySerializer
+from rest_framework import status
 from products.models import Product
-import requests
-from api.authentication import get_JTKAuth
+
 # Create your views here.
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -22,14 +21,10 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         
-        details =(OrderDetail.objects.filter(id__exact = self.get_object().id).values()[0]) #[{'id': 54, 'order_id': 80, 'product_id': 10, 'cuantity': 1}]
-        cuantity = details['cuantity']
-        pk = details['product_id']
-        data ={
-            'cuantity' : cuantity
-        }
-        endpoint = f"http://localhost:8000/api/products/{pk}/"
-        requests.patch(endpoint,json=data,headers=get_JTKAuth())
+        oDetail = self.get_object()
+        product = oDetail.product
+        product.increment_stock(oDetail.cuantity)
+        product.save()
 
         return super().destroy(request, *args, **kwargs)
 
@@ -40,12 +35,21 @@ class OrderViewSet(viewsets.ModelViewSet):
         if request.data.get('cuantity'):
             product.increment_stock(obj.cuantity)
             product.save()
-            print(product.get_stock())
-            if int(product.get_stock()) > int(request.data.get('cuantity')):
+            if int(product.get_stock()) >= int(request.data.get('cuantity')):
                 product.decrement_stock(int(request.data.get('cuantity')))
                 product.save()
-
+            else:
+                return Response("No hay suficiente stock, stock acutal{}".format(product.get_stock()),status.HTTP_400_BAD_REQUEST)
         return super().update(request, *args, **kwargs)
 
-    
+    def create(self, request, *args, **kwargs):
+        
+        product = Product.objects.filter(id__exact=request.data.get('product'))[0]
+        if request.data.get('cuantity') <= product.get_stock():
+            product.decrement_stock(request.data.get('cuantity'))
+            product.save()
+        else:
+            return Response("No hay suficiente stock. Stock actual: {}".format(product.get_stock()),status.HTTP_400_BAD_REQUEST)
+
+        return super().create(request, *args, **kwargs)
     

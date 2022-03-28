@@ -52,12 +52,10 @@ class OrderDetailModifySerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        # print(validated_data)
         product = validated_data.pop('product')
         cuantity =validated_data.pop('cuantity')
         product.decrement_stock(cuantity)
         product.save()
         validated_data["product"] = (product)
         validated_data["cuantity"] = (cuantity)
-        # print(validated_data)
         return super().create(validated_data)

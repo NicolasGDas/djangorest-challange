@@ -1,4 +1,3 @@
-import json
 from math import prod
 from rest_framework import  viewsets
 from orders_details.models import OrderDetail
@@ -9,6 +8,7 @@ import requests
 from rest_framework.response import Response
 from api.authentication import get_JTKAuth
 from rest_framework import status
+from products.models import Product
 # Create your views here.
 
 class OrderList(viewsets.ModelViewSet):
@@ -46,25 +46,26 @@ class OrderList(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
-
         previus_detail = {}
-        new_order = Order.objects.create()
-        new_order.save()
         if request.data.get("orderDetails"):
+            new_order = Order.objects.create()
+            new_order.save()
             order_detail_post = request.data["orderDetails"]
-            order_detail_post = request.data["orderDetails"]
+            
             for orderDetail in order_detail_post:
                 if not previus_detail:
-                    
                     previus_detail = orderDetail
                     self.create_details(orderDetail,new_order)
                 elif not previus_detail.get('product').get('pk') == orderDetail['product']['pk']:
-                    
                     self.create_details(orderDetail,new_order)
+                    previus_detail = orderDetail
 
-        serializer = OrderSerializer(new_order)
-        return Response(serializer.data)
+            
+            serializer = OrderSerializer(new_order)
 
+            return Response(serializer.data,status.HTTP_201_CREATED)
+        else:
+            return Response("No ingreso ningun detalle de order, ingrese uno por favor",status.HTTP_400_BAD_REQUEST)
 
 
     def create_details(self,orderDetail,new_order):
@@ -73,8 +74,7 @@ class OrderList(viewsets.ModelViewSet):
                 "order": new_order.id,
                 "product": str(orderDetail['product']['pk'])
             }
-        response = requests.post("http://localhost:8000/api/ordersDetails/",json=data,headers=get_JTKAuth())
-        print(response.status_code)
-        if response.status_code == 400:
-            Order.objects.filter(id__exact = new_order.id).delete()
-            return Response(response.json())
+        serializer = OrderDetailModifySerializer(data= data)
+        if serializer.is_valid():
+            print("is valid")
+            serializer.save()
